@@ -173,9 +173,10 @@ def run_hotkey(box, app):
 
 
 if __name__ == "__main__":
-    print("\n\n    screen2clip v1.0\n")
-    print(" alt+ctrl >>  to capture")
-    print(" alt+esc >>  to exit\n\n")
+    print("\n  >> screen2clip v1.0\n")
+    print("Help:")
+    print("  alt+ctrl > to capture")
+    print("  alt+esc > to exit\n\n")
 
     app = QApplication(sys.argv)
 

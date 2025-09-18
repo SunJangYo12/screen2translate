@@ -14,7 +14,9 @@ NOTE: change your path in screen2clip/pyvenv.cfg
 # run
 ```bash
 cd screen2translate
-python3 myapp.py
+sudo python3 myapp.py
 ```
+NOTE: root is require by global hotkeys shortkey.
+
 
 ![Screenshot](Screenshot_2025-09-18_19-44-02.png)

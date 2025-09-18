@@ -7,8 +7,8 @@ import sys
 import pytesseract
 import pyperclip
 from PyQt5.QtWidgets import QApplication, QWidget
-from PyQt5.QtCore import Qt, QTimer, QRect
-from PyQt5.QtGui import QScreen
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QScreen, QPainter, QColor
 
 class OCRBox(QWidget):
     def __init__(self):
@@ -23,6 +23,14 @@ class OCRBox(QWidget):
         self.timer.start(3000)
 
         self.show()
+
+    def paintEvent(self, event):
+        """Bikin kotak semi-transparan gelap"""
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setBrush(QColor(0, 0, 0, 100))  # hitam, alpha=100 (0-255)
+        painter.setPen(QColor(255, 255, 255, 150))  # garis putih transparan
+        painter.drawRect(self.rect())
 
     def capture_and_ocr(self):
         # ambil screenshot area kotak

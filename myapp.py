@@ -1,6 +1,6 @@
 
 #sudo apt install tesseract-ocr
-#pip install pytesseract pillow pyqt5 pyperclip keyboard
+#pip install pytesseract pillow pyqt5 pyperclip keyboard requests
 
 
 import sys
@@ -13,6 +13,9 @@ from PyQt5.QtGui import QScreen, QPainter, QColor, QCursor, QFont
 import threading
 import keyboard   # global hotkey: run with root
 import subprocess
+import requests
+import urllib.parse
+
 
 
 class ResultBox(QWidget):
@@ -22,16 +25,10 @@ class ResultBox(QWidget):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool)
         self.setAttribute(Qt.WA_TranslucentBackground)
 
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(10, 10, 10, 10)  # <--- padding biar ga nempel
-
-
         self.label = QLabel("", self)
         self.label.setStyleSheet("color: white; background: transparent;")
         self.label.setFont(QFont("Arial", 12))
         self.label.setWordWrap(True)
-
-        layout.addWidget(self.label)
 
         self.resize(300, 100)
         self.move_to_topright()
@@ -47,15 +44,13 @@ class ResultBox(QWidget):
         self.label.setText(text)
         self.label.adjustSize()
 
-        self.adjustSize()
-
         new_width = self.label.width() + 20
         new_height = self.label.height() + 20
 
         #self.resize(300, self.label.height() + 20)
         self.resize(new_width, new_height) # ukuran window menyesuikan isi text
-        self.move_to_topright()
 
+        self.move_to_topright()
         self.show()
 
     def paintEvent(self, event):
@@ -126,9 +121,29 @@ class OCRBox(QWidget):
         self.dragging = False
         self.resizing = False
 
+
+    def translate(self, text, target="id"):
+        base_url = "https://translate.googleapis.com/translate_a/single"
+        params = {
+            "client": "gtx",
+            "sl": "auto",   # source language auto detect
+            "tl": target,  # target language
+            "dt": "t",
+            "q": text,
+        }
+        url = f"{base_url}?{urllib.parse.urlencode(params)}"
+        resp = requests.get(url)
+        resp.raise_for_status()
+
+        data = resp.json()
+
+        return "".join([seg[0] for seg in data[0] if seg[0]])
+
+
     def capture_and_ocr(self):
         # screenshot area kotak
-        subprocess.run(["notify-send", "Wait..."])
+
+        self.result_box.set_text("Wait...".strip())
 
         screen = QApplication.primaryScreen()
         geo = self.geometry()
@@ -141,13 +156,14 @@ class OCRBox(QWidget):
         text = pytesseract.image_to_string(img_path)
 
         if text.strip():
-            pyperclip.copy(text)
-            print("Teks OCR:", text.strip())
-            subprocess.run(["notify-send", "text copy to cliboard"])
-            self.result_box.set_text(text.strip())
+            #pyperclip.copy(text)
+            self.result_box.set_text("Translate...".strip())
+
+            mytranslate = self.translate(text, "id")
+
+            self.result_box.set_text(mytranslate.strip())
         else:
-            print("Tidak ada teks terdeteksi.")
-            subprocess.run(["notify-send", "No text detect"])
+            self.result_box.set_text("Failed!".strip())
 
 def run_hotkey(box, app):
     keyboard.add_hotkey("alt+ctrl", box.capture_and_ocr)  # tekan spasi kapan saja
@@ -157,10 +173,9 @@ def run_hotkey(box, app):
 
 
 if __name__ == "__main__":
-    print("\n\nscreen2clip v1.0\n\n")
-    print("   Drag and drop the box\n")
+    print("\n\n    screen2clip v1.0\n")
     print(" alt+ctrl >>  to capture")
-    print(" alt+esc >>  to exit")
+    print(" alt+esc >>  to exit\n\n")
 
     app = QApplication(sys.argv)
 

@@ -1,6 +1,6 @@
 
 #sudo apt install tesseract-ocr
-#pip install pytesseract pillow pyqt5 pyperclip
+#pip install pytesseract pillow pyqt5 pyperclip keyboard
 
 
 import sys
@@ -9,6 +9,9 @@ import pyperclip
 from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtCore import Qt, QTimer, QRect
 from PyQt5.QtGui import QScreen, QPainter, QColor, QCursor
+import threading
+import keyboard   # global hotkey: run with root
+import subprocess
 
 class OCRBox(QWidget):
     def __init__(self):
@@ -17,10 +20,6 @@ class OCRBox(QWidget):
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setGeometry(200, 200, 400, 150)  # posisi & ukuran kotak
 
-        # OCR timer
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.capture_and_ocr)
-        self.timer.start(30000)
 
         # variabel drag/resize
         self.dragging = False
@@ -34,7 +33,7 @@ class OCRBox(QWidget):
         """Kotak semi-transparan gelap"""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setBrush(QColor(0, 0, 0, 100))   # hitam transparan
+        painter.setBrush(QColor(0, 0, 0, 30))   # hitam transparan
         painter.setPen(QColor(255, 255, 255, 150))  # garis putih
         painter.drawRect(self.rect())
 
@@ -73,6 +72,8 @@ class OCRBox(QWidget):
 
     def capture_and_ocr(self):
         # screenshot area kotak
+        subprocess.run(["notify-send", "Wait..."])
+
         screen = QApplication.primaryScreen()
         geo = self.geometry()
         pixmap = screen.grabWindow(0, geo.x(), geo.y(), geo.width(), geo.height())
@@ -86,12 +87,33 @@ class OCRBox(QWidget):
         if text.strip():
             pyperclip.copy(text)
             print("Teks OCR:", text.strip())
+            subprocess.run(["notify-send", "text copy to cliboard"])
         else:
             print("Tidak ada teks terdeteksi.")
+            subprocess.run(["notify-send", "No text detect"])
+
+def run_hotkey(box, app):
+    keyboard.add_hotkey("alt+ctrl", box.capture_and_ocr)  # tekan spasi kapan saja
+    keyboard.add_hotkey("alt+esc", app.quit)
+    keyboard.wait()  # biar listener tetap hidup
+
+
 
 if __name__ == "__main__":
+    print("\n\nscreen2clip v1.0\n")
+    print("   Drag and drop the box")
+    print("    alt+ctrl >>  to capture")
+    print("    alt+esc >>  to exit")
+
     app = QApplication(sys.argv)
     box = OCRBox()
+
+    # jalankan listener di thread terpisah
+    hotkey_thread = threading.Thread(target=run_hotkey, args=(box, app), daemon=True)
+    hotkey_thread.start()
+
+
+
     sys.exit(app.exec_())
 
 

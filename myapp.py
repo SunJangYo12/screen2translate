@@ -27,7 +27,7 @@ class ResultBox(QWidget):
 
         self.label = QLabel("", self)
         self.label.setStyleSheet("color: white; background: transparent;")
-        self.label.setFont(QFont("Arial", 12))
+        self.label.setFont(QFont("Bold", 11))
         self.label.setWordWrap(True)
 
         self.resize(300, 100)
@@ -55,7 +55,7 @@ class ResultBox(QWidget):
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.setBrush(QColor(0, 0, 0, 150))  # hitam semi-transparan
+        painter.setBrush(QColor(0, 0, 0, 250))  # hitam semi-transparan
         painter.setPen(Qt.NoPen)
         painter.drawRoundedRect(self.rect(), 10, 10)
 
@@ -84,7 +84,7 @@ class OCRBox(QWidget):
         """Kotak semi-transparan gelap"""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setBrush(QColor(0, 0, 0, 30))   # hitam transparan
+        painter.setBrush(QColor(0, 150, 0, 30))   # hitam transparan
         painter.setPen(QColor(255, 255, 255, 150))  # garis putih
         painter.drawRect(self.rect())
 

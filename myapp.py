@@ -26,7 +26,7 @@ class ResultBox(QWidget):
         self.setAttribute(Qt.WA_TranslucentBackground)
 
         self.label = QLabel("", self)
-        self.label.setStyleSheet("color: white; background: transparent;")
+        self.label.setStyleSheet("color: black; background: transparent;")
         self.label.setFont(QFont("Bold", 11))
         self.label.setWordWrap(True)
 
@@ -55,7 +55,7 @@ class ResultBox(QWidget):
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.setBrush(QColor(0, 0, 0, 250))  # hitam semi-transparan
+        painter.setBrush(QColor(255, 255, 255, 250))  # hitam semi-transparan
         painter.setPen(Qt.NoPen)
         painter.drawRoundedRect(self.rect(), 10, 10)
 

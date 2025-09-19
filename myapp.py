@@ -15,7 +15,7 @@ import keyboard   # global hotkey: run with root
 import subprocess
 import requests
 import urllib.parse
-
+import socket
 
 
 class ResultBox(QWidget):
@@ -140,20 +140,40 @@ class OCRBox(QWidget):
         return "".join([seg[0] for seg in data[0] if seg[0]])
 
 
+    def ocr_remote(self, img_path):
+        ip = "192.168.0.100"
+
+        print(f"[+] with ocr api from {ip}")
+        self.result_box.set_text("OCR remote api Wait...".strip())
+
+        client = socket.socket()
+        client.connect((ip, 5001))
+
+        with open(img_path, "rb") as f:
+            client.sendall(f.read())
+
+        client.shutdown(socket.SHUT_WR)
+
+        response = client.recv(1024).decode()
+
+        client.close()
+        return response
+
+
     def capture_and_ocr(self):
         # screenshot area kotak
-
-        self.result_box.set_text("Wait...".strip())
+        self.result_box.set_text("OCR Wait...".strip())
 
         screen = QApplication.primaryScreen()
         geo = self.geometry()
         pixmap = screen.grabWindow(0, geo.x(), geo.y(), geo.width(), geo.height())
 
-        img_path = "capture.png"
+        img_path = "/tmp/capture.png"
         pixmap.save(img_path)
 
         # OCR
-        text = pytesseract.image_to_string(img_path)
+        #text = pytesseract.image_to_string(img_path)
+        text = self.ocr_remote(img_path)
 
         if text.strip():
             #pyperclip.copy(text)

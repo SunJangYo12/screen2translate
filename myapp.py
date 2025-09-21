@@ -39,7 +39,7 @@ class ResultBox(QWidget):
         self.move(x, y)
 
     def set_text(self, text):
-        self.label.setText("\n"+text)
+        self.label.setText(text)
         self.label.adjustSize()
 
         new_width = self.label.width() + 20

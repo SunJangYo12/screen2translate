@@ -16,7 +16,7 @@ import subprocess
 import requests
 import urllib.parse
 import socket
-
+import re
 
 class ResultBox(QWidget):
     """Kotak kecil transparan untuk menampilkan hasil OCR"""
@@ -121,6 +121,14 @@ class OCRBox(QWidget):
         self.dragging = False
         self.resizing = False
 
+    def clean_hyphenation(self, text: str) -> str:
+       # hapus tanda hubung di akhir baris, sambungkan langsung
+       text = re.sub(r'-\s*\n\s*', '', text)
+       # normalisasi newline ganda → 1 newline
+       text = re.sub(r'\n+', '\n', text)
+       return text
+
+
 
     def translate(self, text, target="id"):
         base_url = "https://translate.googleapis.com/translate_a/single"
@@ -182,6 +190,8 @@ class OCRBox(QWidget):
         # OCR
         #text = pytesseract.image_to_string(img_path)
         text = self.ocr_remote(img_path)
+
+        text = self.clean_hyphenation(text)
 
         if text.strip():
             #pyperclip.copy(text)

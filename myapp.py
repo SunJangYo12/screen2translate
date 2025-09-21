@@ -76,7 +76,7 @@ class OCRBox(QWidget):
         self.dragging = False
         self.resizing = False
         self.drag_pos = None
-        self.resize_margin = 10  # area sensitif untuk resize
+        self.resize_margin = 50  # area sensitif untuk resize
 
         self.show()
 
@@ -170,6 +170,8 @@ class OCRBox(QWidget):
     def clip_translate(self):
         self.result_box.set_text("clipoard...".strip())
         text = pyperclip.paste()
+
+        text = self.clean_hyphenation(text)
 
         mytranslate = self.translate(text, "id")
 

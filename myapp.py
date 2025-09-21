@@ -22,11 +22,9 @@ class ResultBox(QWidget):
     """Kotak kecil transparan untuk menampilkan hasil OCR"""
     def __init__(self):
         super().__init__()
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool)
-        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.Tool)
 
         self.label = QLabel("", self)
-        self.label.setStyleSheet("color: black; background: transparent;")
         self.label.setFont(QFont("Arial", 13))
         self.label.setWordWrap(True)
 
@@ -53,11 +51,6 @@ class ResultBox(QWidget):
         self.move_to_topright()
         self.show()
 
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.setBrush(QColor(200, 200, 200, 250))  # hitam semi-transparan
-        painter.setPen(Qt.NoPen)
-        painter.drawRoundedRect(self.rect(), 10, 10)
 
     def mousePressEvent(self, event):
         self.close()

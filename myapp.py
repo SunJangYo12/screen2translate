@@ -27,7 +27,7 @@ class ResultBox(QWidget):
 
         self.label = QLabel("", self)
         self.label.setStyleSheet("color: black; background: transparent;")
-        self.label.setFont(QFont("Bold", 11))
+        self.label.setFont(QFont("Arial", 13))
         self.label.setWordWrap(True)
 
         self.resize(300, 100)

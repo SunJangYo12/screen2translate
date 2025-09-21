@@ -55,7 +55,7 @@ class ResultBox(QWidget):
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.setBrush(QColor(255, 255, 255, 250))  # hitam semi-transparan
+        painter.setBrush(QColor(200, 200, 200, 250))  # hitam semi-transparan
         painter.setPen(Qt.NoPen)
         painter.drawRoundedRect(self.rect(), 10, 10)
 
@@ -159,6 +159,14 @@ class OCRBox(QWidget):
         client.close()
         return response
 
+    def clip_translate(self):
+        self.result_box.set_text("clipoard...".strip())
+        text = pyperclip.paste()
+
+        mytranslate = self.translate(text, "id")
+
+        self.result_box.set_text(mytranslate)
+
 
     def capture_and_ocr(self):
         # screenshot area kotak
@@ -186,7 +194,8 @@ class OCRBox(QWidget):
             self.result_box.set_text("Failed!".strip())
 
 def run_hotkey(box, app):
-    keyboard.add_hotkey("alt+ctrl", box.capture_and_ocr)  # tekan spasi kapan saja
+    keyboard.add_hotkey("alt+ctrl", box.capture_and_ocr)
+    keyboard.add_hotkey("alt+shift", box.clip_translate)
     keyboard.add_hotkey("alt+esc", app.quit)
     keyboard.wait()  # biar listener tetap hidup
 
@@ -196,6 +205,7 @@ if __name__ == "__main__":
     print("\n  >> screen2clip v1.0\n")
     print("Help:")
     print("  alt+ctrl > to capture")
+    print("  alt+shift > to capture using clipboard")
     print("  alt+esc > to exit\n\n")
 
     app = QApplication(sys.argv)

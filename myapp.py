@@ -8,7 +8,7 @@ import pytesseract
 import pyperclip
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
 from PyQt5.QtCore import Qt, QTimer, QRect
-from PyQt5.QtGui import QScreen, QPainter, QColor, QCursor, QFont
+from PyQt5.QtGui import QScreen, QPainter, QColor, QCursor, QFont, QPen
 
 import threading
 import keyboard   # global hotkey: run with root
@@ -77,8 +77,12 @@ class OCRBox(QWidget):
         """Kotak semi-transparan gelap"""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setBrush(QColor(0, 150, 0, 30))   # hitam transparan
-        painter.setPen(QColor(255, 255, 255, 150))  # garis putih
+        painter.setBrush(QColor(0, 0, 0, 0))   # hitam transparan
+
+        pen = QPen(QColor(255, 0, 0))  # garis merah
+        pen.setWidth(2)
+
+        painter.setPen(pen)
         painter.drawRect(self.rect())
 
     def mousePressEvent(self, event):

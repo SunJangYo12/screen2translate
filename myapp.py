@@ -166,14 +166,14 @@ class OCRBox(QWidget):
 
     def clip_translate(self):
         self.result_box.set_text("clipoard...".strip())
-        text = pyperclip.paste()
-
+        text = subprocess.check_output(
+           ["xclip", "-selection", "primary", "-o"],
+           text=True
+        )
         text = self.clean_hyphenation(text)
 
         mytranslate = self.translate(text, "id")
-
         self.result_box.set_text(mytranslate)
-
 
     def capture_and_ocr(self):
         # screenshot area kotak

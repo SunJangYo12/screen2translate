@@ -17,6 +17,7 @@ import requests
 import urllib.parse
 import socket
 import re
+import telnetlib
 
 class ResultBox(QWidget):
     """Kotak kecil transparan untuk menampilkan hasil OCR"""
@@ -126,6 +127,16 @@ class OCRBox(QWidget):
        return text
 
 
+    def translate_offline(self, text, target="id"):
+        tn = telnetlib.Telnet("192.168.0.100", 9090, timeout=10)
+        tn.write(text.encode('ascii') + b"\n\n\n\n")
+
+        tn.read_until(b"============= Text Output ================")
+        result = tn.read_until(b"============= Text Output ================")
+        result = result.decode('ascii').strip("\n")
+        result = result.split("\n\n======")[0]
+        return result
+
 
     def translate(self, text, target="id"):
         base_url = "https://translate.googleapis.com/translate_a/single"
@@ -163,6 +174,17 @@ class OCRBox(QWidget):
 
         client.close()
         return response
+
+    def clip_translate_offline(self):
+        self.result_box.set_text("offline clipoard...".strip())
+        text = subprocess.check_output(
+           ["xclip", "-selection", "primary", "-o"],
+           text=True
+        )
+        text = self.clean_hyphenation(text)
+
+        mytranslate = self.translate_offline(text, "id")
+        self.result_box.set_text(mytranslate)
 
     def clip_translate(self):
         self.result_box.set_text("clipoard...".strip())
@@ -205,6 +227,7 @@ class OCRBox(QWidget):
 def run_hotkey(box, app):
     keyboard.add_hotkey("alt+ctrl", box.capture_and_ocr)
     keyboard.add_hotkey("alt+shift", box.clip_translate)
+    keyboard.add_hotkey("alt+z", box.clip_translate_offline)
     keyboard.add_hotkey("alt+esc", app.quit)
     keyboard.wait()  # biar listener tetap hidup
 
@@ -215,6 +238,7 @@ if __name__ == "__main__":
     print("Help:")
     print("  alt+ctrl > to capture")
     print("  alt+shift > to capture using clipboard")
+    print("  alt+z > to capture using clipboard with offline translate in apk")
     print("  alt+esc > to exit\n\n")
 
     app = QApplication(sys.argv)

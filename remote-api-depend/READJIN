@@ -1,0 +1,8 @@
+1. dpkg -i clang-19
+#2. apt update optional for new tessearch install
+3. dpkg -i tessearct
+4. dpkg -i python3.12
+5. python screen2api/myapp.py
+
+NOTE: ini membutuhkan termux bersih dengan copy paket dari usr.tar
+yang hanya berisi paket penting seperti sshd
